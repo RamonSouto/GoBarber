@@ -1,8 +1,12 @@
 import * as Yup from 'yup';
-import { startOfHour, parseISO, isBefore } from 'date-fns';
+import { startOfHour, parseISO, isBefore, format, subHours } from 'date-fns';
+import pt from 'date-fns/locale/pt';
 import Appointment from '../models/Appointment';
 import User from '../models/User';
 import File from '../models/File';
+import Notification from '../schemas/Notification';
+import CancellationMail from '../jobs/CancellationMail';
+import Queue from '../../lib/Queue';
 
 class AppointmentController {
   async index(req, res) {
@@ -87,11 +91,71 @@ class AppointmentController {
         .json({ error: 'Appointment date is not available' });
     }
 
+    /* Verificar se pestador e igual a cliente */
+    if (req.userId === provider_id) {
+      res.status(400).json({ error: 'Provider equals as Client' });
+    }
+
     const appointment = await Appointment.create({
       user_id: req.userId,
       provider_id,
       date,
     });
+
+    /* Pegando nome do usuario */
+    const user = await User.findByPk(req.userId);
+
+    /* Formatar data */
+    const formattedDate = format(
+      hourStart,
+      "'dia' dd 'de' MMMM ', as' HH:mm'h'",
+      { locale: pt }
+    );
+    /* Notificar prestador de serviço */
+    await Notification.create({
+      content: `Novo agendamento de ${user.name} para ${formattedDate}`,
+      user: provider_id,
+    });
+
+    return res.json(appointment);
+  }
+
+  async delete(req, res) {
+    const appointment = await Appointment.findByPk(req.params.id, {
+      include: [
+        {
+          model: User,
+          as: 'provider',
+          attributes: ['name', 'email'],
+        },
+        {
+          model: User,
+          as: 'user',
+          attributes: ['id', 'name'],
+        },
+      ],
+    });
+
+    if (appointment.user_id !== req.userId) {
+      return res.status(401).json({
+        error: "You don't have permission to cancel this appointment ",
+      });
+    }
+
+    /* Pega a hora do agendamento e subtrai duas horas */
+    const dateWithSub = subHours(appointment.date, 2);
+
+    if (isBefore(dateWithSub, new Date())) {
+      return res
+        .status(401)
+        .json({ error: 'You can only appointment 2 hours in advanced' });
+    }
+
+    appointment.canceled_at = new Date();
+
+    await appointment.save();
+
+    await Queue.add(CancellationMail.key, { appointment });
 
     return res.json(appointment);
   }
