@@ -3,6 +3,7 @@ import * as yup from 'yup';
 import User from '../models/User';
 import authConfig from '../../config/auth';
 
+/* */
 class SessionController {
   async store(req, res) {
     const schema = yup.object().shape({

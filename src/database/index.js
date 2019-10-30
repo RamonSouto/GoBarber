@@ -9,6 +9,7 @@ import databaseconfig from '../config/database';
 
 const models = [User, File, Appointmet];
 
+/* */
 class Database {
   constructor() {
     this.init();

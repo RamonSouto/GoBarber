@@ -8,6 +8,7 @@ import Notification from '../schemas/Notification';
 import CancellationMail from '../jobs/CancellationMail';
 import Queue from '../../lib/Queue';
 
+/* */
 class AppointmentController {
   async index(req, res) {
     const { page = 1 } = req.query;
@@ -20,7 +21,7 @@ class AppointmentController {
     const appointments = await Appointment.findAll({
       where: { user_id: req.userId, canceled_at: null },
       order: ['date'], // ordenado por data,
-      attributes: ['id', 'date'], // trazer somenteo id e data,
+      attributes: ['id', 'date', 'past', 'cancelable'], // trazer somenteo id e data,
       limit: 20,
       offset: (page - 1) * 20,
       include: [

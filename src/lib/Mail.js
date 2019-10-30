@@ -4,6 +4,7 @@ import nodemailerhbs from 'nodemailer-express-handlebars';
 import { resolve } from 'path';
 import mailconfig from '../config/mail';
 
+/* */
 class Mail {
   constructor() {
     const { host, port, secure, auth } = mailconfig;

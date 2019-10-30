@@ -1,6 +1,7 @@
 import * as yup from 'yup';
 import User from '../models/User';
 
+/* */
 class UserController {
   async store(req, res) {
     const schema = yup.object().shape({

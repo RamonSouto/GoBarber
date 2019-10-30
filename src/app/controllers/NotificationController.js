@@ -1,6 +1,7 @@
 import Notification from '../schemas/Notification';
 import User from '../models/User';
 
+/* */
 class NotificationController {
   async index(req, res) {
     /* Faz verificação se provider_id e um provider */
