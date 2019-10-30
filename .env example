@@ -1,0 +1,27 @@
+APP_URL=http://localhost:3333
+NODE_ENV=development
+
+#Senha de autenticação
+APP_SECRET=
+
+#Dados do Banco
+DB_HOST=localhost
+DB_USER=
+DB_PASS=
+DB_NAME=goarber
+
+#Dados do MongoDB
+MONGO_URL=mongodb://localhost:27017/gobarber
+
+#Dados Redis
+REDIS_HOST=127.0.0.1
+REDIS_PORT=6379
+
+#Configuração de email
+MAIL_HOST=
+MAIL_PORT=2525
+MAIL_USER=
+MAIL_PASS=
+
+#Sentry
+SENTRY_DSN=
